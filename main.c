@@ -44,6 +44,12 @@ void _delay_us(uint16_t us) {
   }
 }
 
+/**
+ * @brief Приводит шину данных дисплея в указанное состояние
+ * @param rs Бит регистра (регистр команд/регистр данных)
+ * @param rw Бит направления (чтение/запись)
+ * @param data Команда/Данные
+ */
 void j204a_applay(uint8_t rs, uint8_t rw, uint8_t data) {
     // Приводим шину данных в требующееся состояние
     // и ждем 25 микросекунд.
@@ -70,38 +76,32 @@ void j204a_refresh(void) {
     for(col = 0; col < J204A_WIDTH; col++) {
       J204A_PRINT(j204a_ram[line][col]);
     }
-    switch(line) {
+    // В имеющемся дисплеи строки отображаются в видеопамять
+    // "черезстрочно"  0-2-1-3
+    switch(line) { 
       case 0 : line = 2; break;
       case 1 : line = 3; break;
       case 2 : line = 1; break;
-      case 3 : line = 4; break;
+      case 3 : line = 4; break; // Выход из цыкла.
     }
   }
 }
 
 void j204a_clear(void) {
-  uint8_t* ram = (uint8_t*)j204a_ram;
   uint8_t n;
   J204A_CLEAR_DISPLAY;
   for(n = 0; n < (J204A_WIDTH * 4); n++) {
-    ram[n] = 0x20;
+    ((uint8_t*)j204a_ram)[n] = 0x20; // Забиваем z-буфер пробелами.
   }
 }
-/*
-uint8_t halfchar_to_hex(uint8_t tt) {
-  if (tt < 10) return tt + 48;
-  switch (tt) {
-    case 10 : return 'A'; 
-    case 11 : return 'B';
-    case 12 : return 'C';
-    case 13 : return 'D';
-    case 14 : return 'E';
-    case 15 : return 'F';
-  }
-  return 'X';
-}
-*/
 
+/**
+ * @brief Выводит строку символов в начиная с указанной 
+ *        позиции дисплея.
+ * @param col Номер колонки дисплея 0-19.
+ * @param line Номер строка дисплея 0-3.
+ * @param str Выводимая строка символов.
+ */
 void j204aPrint(uint8_t col, uint8_t line, char* str){
   uint8_t n = 0;
   while(str[n]) {
@@ -133,8 +133,8 @@ void j204aInit(void){
   _delay_ms(2);
   j204a_clear();
 }
+
 int main(void) {
-  //PORTA = 0xFF; // Кнопки
   j204aInit();
   
   j204aPrint(4, 2, "Hello World.");
