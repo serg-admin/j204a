@@ -15,13 +15,7 @@
 #define J204A_PRINT(c) j204a_applay(1, 0, c)
 #define J204A_WIDTH 20
 
-#define J204A_PRINT_HEX(b) j204a_applay(1, 0, halfchar_to_hex(b >> 4));\
-    j204a_applay(1, 0, halfchar_to_hex(b & 0x0F))
-    
-#define BUTTON0 0b11111110
-#define BUTTON1 0b11111101
-#define BUTTON2 0b11111011
-
+// Z- буфер дисплея
 uint8_t j204a_ram[4][J204A_WIDTH];
 
 void _delay_ms(uint16_t ms) {
